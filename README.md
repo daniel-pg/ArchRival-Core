@@ -26,9 +26,13 @@ ArchRival/
 ├── design/             # Synthesizable SystemVerilog code
 │   ├── rtl/            # Core RTL modules (ALU, datapath, control, etc.)
 │   └── include/        # Shared packages, constants, and macros
-├── verif/              # Verification environment
-│   ├── testbench/      # Simulation testbenches
-│   └── formal/         # Formal verification
+├── verif/                  # Verification environment
+│   ├── vip/                # Reusable Verification IP (Agents, UVM components)
+│   ├── testbench/          # Unit/module test harnesses & sequences for simulation
+│   ├── tests/              # Benchmarks & ISA Coverage
+│   │   ├── isa_coverage/   # Assembly/C programs for ISA coverage
+│   │   └── benchmarks/     # Synthetic load tests (e.g., Dhrystone)
+│   └── formal/             # Formal verification
 ├── ip/                 # Vendor-specific IP (memories, PLLs, etc.)
 │   ├── intel/
 │   ├── xilinx/
