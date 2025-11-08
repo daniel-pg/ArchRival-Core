@@ -2,22 +2,21 @@
 
 ![ArchRival Logo](logo.png)
 
-> *A clean SystemVerilog implementation of the ICMC-Processor — redesigned at UNICAMP.*
-
-**ArchRival** is a modernized and modular reimplementation of the [ICMC-Processor](https://github.com/simoesusp/Processador-ICMC/), originally designed by students and faculty from the University of São Paulo (USP). Developed from scratch with clarity, portability, and educational value in mind, this project brings the architecture into a new era — with upgraded structure, refined RTL code, and a layout that cleanly supports multiple FPGA and ASIC targets.
+**ArchRival** is a small and modular SoC + CPU core that implements the [ICMC-Processor](https://github.com/simoesusp/Processador-ICMC/)'s ISA, developed from scratch with maintainability, portability, and educational value in mind.
 
 ---
 
-### 🏁 Key Goals
+## Key Goals
 
-- Replace ugly and verbose VHDL with clean, readable SystemVerilog.  
+- Write a clean and readable SystemVerilog implementation.  
 - Organize the codebase by separating design, verification, and target-specific files.  
-- Make the platform suitable for teaching and experimentation.  
-- Celebrate UNICAMP's champion-level commitment to computing education.
+- Document every aspect of the processor's design, architecture, and the ISA.
+- Maintain compatibility with original ICMC-Processor.
+- Make the platform suitable for teaching and experimentation, by allowing easy addition of new features.
 
 ---
 
-### 📁 Project Structure
+## 📁 Project Structure
 
 ```text
 ArchRival/
@@ -33,6 +32,7 @@ ArchRival/
 │   │   ├── isa_coverage/   # Assembly/C programs for ISA coverage
 │   │   └── benchmarks/     # Synthetic load tests (e.g., Dhrystone)
 │   └── formal/             # Formal verification
+├── model/              # High-level cycle-accurate models and algorithms
 ├── ip/                 # Vendor-specific IP (memories, PLLs, etc.)
 │   ├── intel/
 │   ├── xilinx/
@@ -55,13 +55,6 @@ ArchRival/
 
 ---
 
-### How to 
+## How to Use
 
----
-
-### Recommended Resources
-
----
-
-Stay tuned for documentation, simulator, and toolchain updates.
-PRs and contributions are welcome — unless you're from USP. 😉
+For detailed instructions on how to synthesize and program your FPGA, as well as how to run a demo program, please check out the documentation.
