@@ -8,8 +8,8 @@
 
 ## Key Goals
 
-- Write a clean and readable SystemVerilog implementation.  
-- Organize the codebase by separating design, verification, and target-specific files.  
+- Write a clean and readable SystemVerilog implementation.
+- Organize the codebase by separating design, verification, and target-specific files.
 - Document every aspect of the processor's design, architecture, and the ISA.
 - Maintain compatibility with original ICMC-Processor.
 - Make the platform suitable for teaching and experimentation, by allowing easy addition of new features.
@@ -24,7 +24,7 @@ ArchRival/
 ├── scripts/            # Build and automation scripts
 ├── design/             # Synthesizable SystemVerilog code
 │   ├── rtl/            # Core RTL modules (ALU, datapath, control, etc.)
-│   └── include/        # Shared packages, constants, and macros
+│   └── lib/            # Shared packages, interfaces, constants, and macros
 ├── verif/                  # Verification environment
 │   ├── vip/                # Reusable Verification IP (Agents, UVM components)
 │   ├── testbench/          # Unit/module test harnesses & sequences for simulation
