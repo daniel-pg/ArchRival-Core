@@ -1,6 +1,6 @@
 # ArchRival
 
-![ArchRival Logo](assets/banner.svg)
+![ArchRival Banner](assets/banner.svg)
 
 **ArchRival** is a small and modular SoC + CPU core that implements the [ICMC-Processor](https://github.com/simoesusp/Processador-ICMC/)'s ISA, developed from scratch with maintainability, portability, and educational value in mind.
 
