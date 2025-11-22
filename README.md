@@ -2,7 +2,7 @@
 
 ![ArchRival Banner](assets/banner.svg)
 
-**ArchRival** is a small and modular SoC + CPU core that implements the [ICMC-Processor](https://github.com/simoesusp/Processador-ICMC/)'s ISA, developed from scratch with maintainability, portability, and educational value in mind.
+**ArchRival** is a small and modular **SoC + CPU core** that implements the [ICMC-Processor](https://github.com/simoesusp/Processador-ICMC/)'s ISA, developed from scratch with maintainability, portability, and educational value in mind.
 
 
 ## Key Goals
@@ -25,12 +25,17 @@ However, a closer inspection of their FPGA implementation reveals significant te
     - Inefficient Arithmetic: The use of single-cycle combinational integer division limits the maximum clock frequency and increases the complexity of the synthesized logic circuit.
     - Complex Control Logic: Features a complex instruction decoding mechanism, which increases the critical path and makes verification difficult.
     - Poor Clock Management: Relies on a long cascade of flip-flop clock dividers instead of using PLLs, leading to poor clock skew, slew and jitter.
-    - Potential metastability problems: usage of asynchronous reset synchronous deassertion.
+    - Unsafe Reset Implementation: Usage of asynchronous reset without synchronous deassertion creates potential metastability problems.
     - Low Performance Design: The inherent multi-cycle further exacerbates the poor performance, negatively affecting both instruction throughput and latency.
 
 2. Code Quality: Despite its intention to be a simple design, the VHDL code is verbose, lacks clarity, and is generally hard to read and maintain.
 
 3. Project Organization: The repository is a mess, with different versions and FPGA targets spread over multiple directories. Source files are buried alongside hundreds of project files, automatically generated outputs, and abandoned .bak files, violating every project management principle.
+
+
+## Getting Started
+
+To begin working with the ArchRival Core, whether for simulation, synthesis, or programming an FPGA, please refer to the **BUILD.md** file for a comprehensive guide on required tools, dependencies, and build instructions.
 
 
 ## 📁 Project Structure
@@ -71,6 +76,11 @@ ArchRival/
 ```
 
 
-## How to Use
+## Contributing
 
-For detailed instructions on how to synthesize and program your FPGA, as well as how to run a demo program, please check out the documentation.
+We welcome contributions to the design, verification, and documentation! Please read our **CONTRIBUTING.md** file to learn how you can help and for guidelines on submitting pull requests.
+
+
+## License
+
+This project is licensed under the **CERN Open Hardware Licence Version 2 - Strongly Reciprocal**. See the **LICENSE** file for details.
