@@ -1,5 +1,7 @@
 #import "@preview/basic-report:0.3.1": *
 
+#import "bitfield-table.typ": bitfield-table
+
 #show: it => basic-report(
   doc-category: "Instruction Set Manual",
   doc-title: "ICMC Processor ISA Specification",
@@ -47,7 +49,7 @@ Throughout this document, we use the following conventions to describe instructi
 
 - `Rx`, `Ry`, `Rz`: General-purpose registers, where `x`, `y`, and `z` are indices from 0 to 7.
 - `M[addr]`: The contents of memory at the 16-bit address `addr`.
-- `imm16`: A 16-bit immediate value.
+- `imm`: A 16-bit immediate value.
 - `<=`: Denotes assignment or data transfer.
 
 = Core Architecture
@@ -63,7 +65,7 @@ The CPU contains a set of 16-bit registers accessible, directly or indirectly, t
   [*Register*], [*Width*], [*Description*],
   [`R0`-`R7`], `16-bit`, "Eight General-Purpose Registers (GPRs) for data manipulation.",
   `PC`, `16-bit`, "Program Counter. Holds the address of the next instruction to be fetched.",
-  `SP`, `16-bit`, [Stack Pointer. Points to the top of the stack. It is initialized to `0x7F00` and grows downwards.],
+  `SP`, `16-bit`, [Stack Pointer. Points to the top of the stack and grows downwards.],
   `FR`, `16-bit`, "Flag Register. Stores status flags from arithmetic and logical operations.",
 )
 
@@ -74,7 +76,7 @@ The 16-bit Flag Register holds status bits that reflect the outcome of previous 
 #table(
   columns: (auto, auto, auto, auto),
   stroke: (top: 1pt, bottom: 1pt),
-  [*Bits*], [*Flag*], [*Name*], [*Description*],
+  [*Bits*], [*Abbr.*], [*Flag Name*], [*Description*],
   [`15`-`10`], `-`, `-`, "Reserved.",
   `9`, `N`, `Negative`, "Set if the result of an arithmetic operation is negative.",
   `8`, `SOV`, `Stack_Overflow`, "Stack Overflow flag (Architecturally defined).",
@@ -89,6 +91,14 @@ The 16-bit Flag Register holds status bits that reflect the outcome of previous 
 )
 
 = Instruction Formats
+
+#bitfield-table((
+  ("opcode", 6),
+  ("rx", 3),
+  ("ry", 3),
+  ("unused", 4)
+))
+
 
 = Instruction Set Reference
 
@@ -115,4 +125,3 @@ The 16-bit Flag Register holds status bits that reflect the outcome of previous 
 === Breakpoint
 
 == Input and Output Instructions
-
