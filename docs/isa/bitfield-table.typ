@@ -1,14 +1,15 @@
 #let bitfield-table(
-  // Array of field definitions, where each element is an array
-  // of the form: `(name, bits, [bg-color], [text-color])`.
+  // Array of field definitions: `(name, bits, [bg-color], [text-color])`
   fields,
+  // List of lists, where each inner list contains values for the fields
+  encodings: (),
   // --- Visual Configuration Parameters ---
   header-height: 1.0em,  // Height of the bit-number row
   row-height: 2.5em,     // Height of the field-name row
   tick-height: 3pt,      // Length of the small vertical ticks
   header-size: 1.0em,    // Font size for the bit numbers
   stroke-width: 0.5pt,   // Thickness of borders and ticks
-  row-gutter: 4pt        // Vertical space between bit numbers and the box
+  row-gutter: 5pt        // Vertical space between bit numbers and the box
 ) = {
 
   // 1. Process fields to calculate start/end indices and colors
@@ -36,19 +37,29 @@
     current-bit += bits
   }
 
-  // Reverse the list (MSB to LSB) for display.
+  // Reverse fields for display (MSB -> LSB)
   let items = processed.rev()
 
-  // 2. Render
+  // 2. Prepare Encodings
+  // The table is rendered reversed (MSB first), but users usually
+  // provide data in logical order. We reverse every encoding row
+  // to match the visual column order.
+  let aligned-encodings = encodings.map(row => row.rev())
+
+  // 3. Render
   table(
     columns: items.map(i => i.bits * 1fr),
-    rows: (header-height, row-height),
-    stroke: (x, y) => if y == 0 { none } else { stroke-width },
+    // Row 0: Header, Row 1: Box, Row 2+: Encodings (auto height)
+    rows: (header-height, row-height) + (auto,) * encodings.len(),
+
+    // Only stroke the Box row (Index 1)
+    stroke: (x, y) => if y == 1 { stroke-width } else { none },
+
     column-gutter: 0pt,
     row-gutter: row-gutter,
     inset: 0pt,
 
-    // --- Row 1: Bit Numbers ---
+    // --- Row 0: Bit Numbers ---
     ..items.map(i => {
       layout(size => {
         let w = size.width
@@ -60,18 +71,14 @@
           if i.bits == 1 {
              align(center + bottom, str(i.start))
           } else {
-             place(left + bottom,
-               block(width: bit-width, align(center, str(i.end)))
-             )
-             place(right + bottom,
-               block(width: bit-width, align(center, str(i.start)))
-             )
+             place(left + bottom, block(width: bit-width, align(center, str(i.end))))
+             place(right + bottom, block(width: bit-width, align(center, str(i.start))))
           }
         })
       })
     }),
 
-    // --- Row 2: Field Names with Ticks, BG Color, and Text Color ---
+    // --- Row 1: Field Names (The Box) ---
     ..items.map(i => {
       layout(size => {
         let w = size.width
@@ -93,6 +100,12 @@
           align(center + horizon, text(fill: i.text-color)[#i.name])
         })
       })
+    }),
+
+    // --- Row 2+: Instruction Encodings ---
+    // Flatten the array so table accepts them as individual cells
+    ..aligned-encodings.flatten().map(val => {
+       align(center + top, val)
     })
   )
 }
