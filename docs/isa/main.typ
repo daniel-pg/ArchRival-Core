@@ -102,6 +102,7 @@ The 16-bit Flag Register holds status bits that reflect the outcome of previous 
 
 = Instruction Formats
 
+// TODO
 #bitfield-table((
   ("opcode", 6),
   ("rx", 3),
@@ -114,24 +115,74 @@ The 16-bit Flag Register holds status bits that reflect the outcome of previous 
 
 == Integer Computational Instructions
 
-=== Arithmetic
+==== LOADN -- Load Immediate
 
-=== Logic
+==== NOP -- No Operation
 
-== Memory Instructions
+==== INC / DEC -- Increment / Decrement
 
-=== Load and Store
+==== MOV -- Move Register
 
-=== Stack
+==== ADD / ADDC -- Add
+
+==== SUB / SUBC -- Subtract
+
+==== MUL -- Multiply
+
+==== DIV -- Divide
+
+==== MOD -- Modulo
+
+==== AND -- Logical AND
+
+==== OR -- Logical OR
+
+==== XOR -- Logical XOR
+
+==== NOT -- Logical NOT
+
+==== SHIFT / ROTATE
+
+==== CMP -- Compare
 
 == Execution Flow Instructions
 
 === Unconditional Jumps
 
+==== RTS -- Return from Subroutine
+
 === Conditional Branches
 
-=== Halt
+==== JMP -- Jump
 
-=== Breakpoint
+==== CALL -- Call Subroutine
+
+=== HALT -- Halt Processor
+
+=== BREAKP -- Breakpoint
+
+== Memory Instructions
+
+=== Directly Indexed
+
+==== LOADI -- Direct Load
+
+==== STOREI -- Direct Store
+
+=== Indirectly Indexed
+
+==== LOAD -- Indirect Load
+
+==== STORE -- Indirect Store
+
+=== Stack
+
+==== PUSH -- Push to Stack
+
+==== POP -- Pop from Stack
 
 == I/O Instructions
+
+=== INCHAR -- Input Character
+
+=== OUTCHAR -- Output Character
