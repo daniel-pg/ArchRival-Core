@@ -37,11 +37,14 @@ However, a closer inspection of their FPGA implementation reveals significant te
 
 To begin working with the ArchRival Core, whether for simulation, synthesis, or programming an FPGA, please refer to the **BUILD.md** file for a comprehensive guide on required tools, dependencies, and build instructions.
 
+To familiarize yourself with the processor's Instruction Set Architecture (ISA), its microarchitecture, logic design, and implementation, please refer to our documentation.
+
 
 ## 📁 Project Structure
 
 ```text
 ArchRival/
+├── assets/             # Graphics, logo, banner, diagrams, and schematics.
 ├── docs/               # Documentation and design notes.
 ├── scripts/            # Build and automation scripts
 ├── design/             # Synthesizable SystemVerilog code

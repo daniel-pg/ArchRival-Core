@@ -1,4 +1,6 @@
 #let bitfield-table(
+  // Array of field definitions, where each element is an array
+  // of the form: `(name, bits, [bg-color], [text-color])`.
   fields,
   // --- Visual Configuration Parameters ---
   header-height: 1.0em,  // Height of the bit-number row

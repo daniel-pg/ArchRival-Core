@@ -14,6 +14,7 @@
   it
 )
 
+
 = Introduction
 
 == ICMC ISA Overview
@@ -30,6 +31,7 @@ Designed primarily for simplicity and ease of teaching, this ISA *does NOT suppo
 - Exception and Trap / System Call Handling
 - Memory protection and virtualization
 - Privilege Levels
+- Multiprocessing
 - Atomic Operations
 - Floating-Point Operations
 - Vector Instructions
@@ -38,19 +40,26 @@ Designed primarily for simplicity and ease of teaching, this ISA *does NOT suppo
 ... and so on.
 
 Instead, it supports a very limited set of features, such as:
-- A simple *polled I/O* system consisting of a text-based screen (16 colors, 40 lines x 30 columns) and a keyboard.
-- "Debugging support" via manual single-step instruction execution.
+- A simple *polled I/O* system consisting of a text-based screen (16 colors, 40 lines x 30 columns, with customizable _character generator ROM_) and a keyboard.
+- "Debugging" support via manual single-step instruction execution.
 
-Yes, specifying the I/O systems and peripherals as part of the ISA itself is a questionable idea to say the least, I couldn't agree more. Unfortunately, I'm not the person who makes the rules, that's the way things are, so we must simply deal with it.
+Yes, specifying the I/O systems and peripherals as part of the ISA itself, especially when they keep changing all the time, is a questionable idea to say the least, I couldn't agree more. Unfortunately, I'm not the person who makes the rules, that's the way things are, so we must simply deal with it.
 
 == Notation
 
 Throughout this document, we use the following conventions to describe instructions:
 
-- `Rx`, `Ry`, `Rz`: General-purpose registers, where `x`, `y`, and `z` are indices from 0 to 7.
-- `M[addr]`: The contents of memory at the 16-bit address `addr`.
-- `imm`: A 16-bit immediate value.
-- `<=`: Denotes assignment or data transfer.
+#table(
+  columns: (auto, auto),
+  stroke: (top: 1pt, bottom: 1pt),
+  align: (left, left),
+  [*Notation*], [*Description*],
+  [`Rx`, `Ry`, `Rz`], [General-purpose registers, where `x`, `y`, and `z` are indices from 0 to 7.],
+  `M[addr]`, [The contents of memory at the 16-bit address `addr`.],
+  `imm`, "A 16-bit immediate value.",
+  `<=`, "Denotes assignment or data transfer.",
+)
+
 
 = Core Architecture
 
@@ -90,6 +99,7 @@ The 16-bit Flag Register holds status bits that reflect the outcome of previous 
   `0`, `G`, `Greater`, [Set if a comparison results in greater than (`x > y`).],
 )
 
+
 = Instruction Formats
 
 #bitfield-table((
@@ -124,4 +134,4 @@ The 16-bit Flag Register holds status bits that reflect the outcome of previous 
 
 === Breakpoint
 
-== Input and Output Instructions
+== I/O Instructions
