@@ -324,11 +324,12 @@ Loads an immediate 16-bit value into `Rx`. This operation has nothing to do with
 == Control Flow Instructions
 
 === JMP / CALL
-Conditional Jump or Call to address in *next word*.
+Conditional Jump or Call to address.
 The `Cond` field selects the flag condition (e.g., 0000=Unconditional, 0001=Equal, etc.).
 
 // TODO: Expand flags
 
+*Word 1:*
 #bitfield-table(
   (
     ("Opcode", 6, c-op),
@@ -340,6 +341,10 @@ The `Cond` field selects the flag condition (e.g., 0000=Unconditional, 0001=Equa
     ("CALL",  "Cond", text(fill: gray, "xxxxxx")),
   )
 )
+*Word 2:*
+#bitfield-table((
+  ("Immediate / Address", 16, c-imm),
+))
 
 === RTS
 Return from Subroutine.
