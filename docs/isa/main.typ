@@ -2,15 +2,24 @@
 
 #import "bitfield-table.typ": bitfield-table
 
+// --- Color Palette ---
+#let c-op     = rgb("#d8e2dc") // Pastel Gray-Green
+#let c-reg    = rgb("#ffe5d9") // Pastel Peach
+#let c-imm    = rgb("#d0f4de") // Pastel Mint
+#let c-func   = rgb("#e0c3fc") // Pastel Purple
+#let c-shamt  = rgb("#ffffb4") // Pastel Yellow
+#let c-cond   = rgb("#c0deff") // Pastel Blue
+#let c-unused = rgb("#f5f5f5") // Light Gray
+
 #show: it => basic-report(
   doc-category: "Instruction Set Manual",
-  doc-title: "ICMC Processor ISA Specification",
+  doc-title: "The ICMC ISA Specification",
   author: "Daniel Paulo Garcia",
   affiliation: "Institute of Computing, State University of Campinas (UNICAMP)",
   logo: image("../../assets/logo.svg", width: 2cm),
   language: "en",
   compact-mode: false,
-  heading-color: red,
+  heading-color: rgb("#aa0000"),
   it
 )
 
@@ -19,7 +28,7 @@
 
 == ICMC ISA Overview
 
-The ICMC Instruction Set Architecture (ISA) is a very simplified *16-bit, load-store, RISC(ish), von Neumann architecture* designed for educational purposes. It features *isolated I/O*,  *variable-length instruction encoding* (16-bit/32-bit), a bank of eight general-purpose registers, status flag registers, and support for arithmetic, logical, memory, and control flow operations.
+The ICMC Instruction Set Architecture (ISA) is a simplified *16-bit, load-store, RISC-ish, von Neumann architecture* designed for educational purposes. It features *isolated I/O*, *variable-length instruction encoding* (16-bit/32-bit), a bank of eight general-purpose registers, status flag registers, and support for arithmetic, logical, memory, and control flow operations.
 
 The architecture is defined by its register set, memory model, and the instruction encodings and semantics detailed herein. All data words and registers are 16 bits wide.
 
@@ -68,19 +77,19 @@ Throughout this document, we use the following conventions to describe instructi
 The CPU contains a set of 16-bit registers accessible, directly or indirectly, to the programmer.
 
 #table(
-  columns: (auto, auto, auto),
+  columns: (auto, auto),
   stroke: (top: 1pt, bottom: 1pt),
-  align: (left, left, left),
-  [*Register*], [*Width*], [*Description*],
-  [`R0`-`R7`], `16-bit`, "Eight General-Purpose Registers (GPRs) for data manipulation.",
-  `PC`, `16-bit`, "Program Counter. Holds the address of the next instruction to be fetched.",
-  `SP`, `16-bit`, [Stack Pointer. Points to the top of the stack and grows downwards.],
-  `FR`, `16-bit`, "Flag Register. Stores status flags from arithmetic and logical operations.",
+  align: (left, left),
+  [*Register*], [*Description*],
+  [`R0`-`R7`], "Eight General-Purpose Registers (GPRs) for data manipulation.",
+  `PC`, "Program Counter. Holds the address of the next instruction to be fetched.",
+  `SP`, [Stack Pointer. Points to the top of the stack and grows downwards.],
+  `FR`, "Flag Register. Stores status flags from arithmetic and logical operations.",
 )
 
 == Flags Register (FR)
 
-The 16-bit Flag Register holds status bits that reflect the outcome of previous operations. These flags are used for conditional branching.
+The 16-bit Flag Register holds status bits that reflect the outcome of previous operations, and can affect how some instructions behave.
 
 #table(
   columns: (auto, auto, auto, auto),
@@ -100,89 +109,317 @@ The 16-bit Flag Register holds status bits that reflect the outcome of previous 
 )
 
 
-= Instruction Formats
-
-// TODO
-#bitfield-table((
-  ("opcode", 6),
-  ("rx", 3),
-  ("ry", 3),
-  ("unused", 4)
-))
-
-
 = Instruction Set Reference
 
-== Integer Computational Instructions
+== Arithmetic Instructions
 
-==== LOADN -- Load Immediate
+Arithmetic operations typically use the suffix `10` in the upper 2 bits of the opcode.
 
-==== NOP -- No Operation
+=== ADD / SUB / MUL / DIV
+Performs standard arithmetic between `Ry` and `Rz`, storing the result in `Rx`. The most significant bit (`C`) controls whether the Carry flag is included in the operation.
 
-==== INC / DEC -- Increment / Decrement
+#bitfield-table(
+  (
+    ("Opcode", 6, c-op),
+    ("Rx", 3, c-reg),
+    ("Ry", 3, c-reg),
+    ("Rz", 3, c-reg),
+    ("C", 1, c-func),
+  ),
+  encodings: (
+    ("ADD", "Dest", "Src1", "Src2", "0"),
+    ("ADDC", "Dest", "Src1", "Src2", "1"),
+    ("SUB", "Dest", "Src1", "Src2", "0"),
+    ("SUBC", "Dest", "Src1", "Src2", "1"),
+    ("MUL", "Dest", "Src1", "Src2", "0"),
+    ("DIV", "Dest", "Src1", "Src2", "0"),
+  )
+)
 
-==== MOV -- Move Register
+=== MOD
+Calculates `Rx = Ry MOD Rz`.
 
-==== ADD / ADDC -- Add
+#bitfield-table(
+  (
+    ("Opcode", 6, c-op),
+    ("Rx", 3, c-reg),
+    ("Ry", 3, c-reg),
+    ("Rz", 3, c-reg),
+    ("Unused", 1, c-unused),
+  ),
+  encodings: (
+    ("MOD", "Dest", "Src1", "Src2", text(fill: gray, "x")),
+  )
+)
 
-==== SUB / SUBC -- Subtract
+=== INC / DEC
+Increments or Decrements a register. `Bit 6` determines the operation: `0` increments, `1` decrements.
 
-==== MUL -- Multiply
+#bitfield-table(
+  (
+    ("Opcode", 6, c-op),
+    ("Rx", 3, c-reg),
+    ("Op", 1, c-func),
+    ("Unused", 6, c-unused),
+  ),
+  encodings: (
+    ("INC/DEC", "Dest", "0", text(fill: gray, "xxxxxx")),
+    ("INC/DEC", "Dest", "1", text(fill: gray, "xxxxxx")),
+  )
+)
 
-==== DIV -- Divide
+== Logical Instructions
 
-==== MOD -- Modulo
+Logical operations typically use the suffix `01` in the upper 2 bits of the opcode.
 
-==== AND -- Logical AND
+=== AND / OR / XOR
+Bitwise logical operations.
 
-==== OR -- Logical OR
+#bitfield-table(
+  (
+    ("Opcode", 6, c-op),
+    ("Rx", 3, c-reg),
+    ("Ry", 3, c-reg),
+    ("Rz", 3, c-reg),
+    ("Unused", 1, c-unused),
+  ),
+  encodings: (
+    ("AND", "Dest", "Src1", "Src2", text(fill: gray, "x")),
+    ("OR", "Dest", "Src1", "Src2", text(fill: gray, "x")),
+    ("XOR", "Dest", "Src1", "Src2", text(fill: gray, "x")),
+  )
+)
 
-==== XOR -- Logical XOR
+=== NOT
+Bitwise NOT operation. `Rx = NOT Ry`.
 
-==== NOT -- Logical NOT
+#bitfield-table(
+  (
+    ("Opcode", 6, c-op),
+    ("Rx", 3, c-reg),
+    ("Ry", 3, c-reg),
+    ("Unused", 4, c-unused),
+  ),
+  encodings: (
+    ("NOT", "Dest", "Src", text(fill: gray, "xxxx")),
+  )
+)
 
-==== SHIFT / ROTATE
+=== SHIFT / ROTATE
+Shifts or Rotates `Rx` by `Amount`. The `Type` field determines operation (shift or rotation), direction (left or right) and fill bit.
 
-==== CMP -- Compare
+#bitfield-table(
+  (
+    ("Opcode", 6, c-op),
+    ("Rx", 3, c-reg),
+    ("Type", 3, c-func),
+    ("Amount", 4, c-shamt),
+  ),
+  encodings: (
+    ("SHIFT/ROTATE", "Dest", "SL0", "SH-AMNT"),
+    ("SHIFT/ROTATE", "Dest", "SL1", "SH-AMNT"),
+    ("SHIFT/ROTATE", "Dest", "SR0", "SH-AMNT"),
+    ("SHIFT/ROTATE", "Dest", "SR1", "SH-AMNT"),
+    ("SHIFT/ROTATE", "Dest", "ROR", "SH-AMNT"),
+    ("SHIFT/ROTATE", "Dest", "ROL", "SH-AMNT"),
+  )
+)
 
-== Execution Flow Instructions
+=== CMP
+Compares `Rx` and `Ry` and updates the Flags Register accordingly.
 
-=== Unconditional Jumps
+#bitfield-table(
+  (
+    ("Opcode", 6, c-op),
+    ("Rx", 3, c-reg),
+    ("Ry", 3, c-reg),
+    ("Unused", 4, c-unused),
+  ),
+  encodings: (
+    ("CMP", "Op1", "Op2", text(fill: gray, "xxxx")),
+  )
+)
 
-==== RTS -- Return from Subroutine
+== Data Transfer Instructions
 
-=== Conditional Branches
+=== MOV
+Moves data between registers or the Stack Pointer.
 
-==== JMP -- Jump
+#bitfield-table(
+  (
+    ("Opcode", 6, c-op),
+    ("Rx", 3, c-reg),
+    ("Ry", 3, c-reg),
+    ("Unused", 2, c-unused),
+    ("Mode", 2, c-func),
+  ),
+  encodings: (
+    ("MOV Rx, Ry", "Dest", "Src", text(fill: gray, "xx"), "00"),
+    ("MOV Rx, SP", "Dest", text(fill: gray, "xxx"), text(fill: gray, "xx"), "01"),
+    ("MOV SP, Rx", "Src",  text(fill: gray, "xxx"), text(fill: gray, "xx"), "11"),
+  )
+)
 
-==== CALL -- Call Subroutine
+=== LOAD / STORE (Direct Addressing)
+Loads from or Stores to a 16-bit memory address provided in the immediate value.
 
-=== HALT -- Halt Processor
+`LOAD`: `Rx <- M[addr]`. \
+`STORE`: `M[addr] <- Rx`.
 
-=== BREAKP -- Breakpoint
+*Word 1:*
+#bitfield-table(
+  (
+    ("Opcode", 6, c-op),
+    ("Rx", 3, c-reg),
+    ("Unused", 7, c-unused),
+  ),
+  encodings: (
+    ("LOAD", "Dest", text(fill: gray, "xxxxxxx")),
+    ("STORE", "Src",  text(fill: gray, "xxxxxxx")),
+  )
+)
+*Word 2:*
+#bitfield-table((
+  ("Immediate / Address", 16, c-imm),
+))
 
-== Memory Instructions
+=== LOADI / STOREI (Indirect Addressing)
+Accesses memory using an address stored in a register.
 
-=== Directly Indexed
+`LOADI`: `Rx <- M[Ry]`. \
+`STOREI`: `M[Rx] <- Ry`.
 
-==== LOADI -- Direct Load
+#bitfield-table(
+  (
+    ("Opcode", 6, c-op),
+    ("Rx", 3, c-reg),
+    ("Ry", 3, c-reg),
+    ("Unused", 4, c-unused),
+  ),
+  encodings: (
+    ("LOAD-INDEX", "Dest", "AddrReg", text(fill: gray, "xxxx")),
+    ("STORE-INDEX", "AddrReg", "Src", text(fill: gray, "xxxx")),
+  )
+)
 
-==== STOREI -- Direct Store
+=== LOADN (Immediate)
+Loads an immediate 16-bit value into `Rx`. This operation has nothing to do with memory access.
 
-=== Indirectly Indexed
+*Word 1:*
+#bitfield-table(
+  (
+    ("Opcode", 6, c-op),
+    ("Rx", 3, c-reg),
+    ("Unused", 7, c-unused),
+  ),
+  encodings: (
+    ("LOADIMED", "Dest", text(fill: gray, "xxxxxxx")),
+  )
+)
+*Word 2:*
+#bitfield-table((
+  ("Immediate", 16, c-imm),
+))
 
-==== LOAD -- Indirect Load
+== Control Flow Instructions
 
-==== STORE -- Indirect Store
+=== JMP / CALL
+Conditional Jump or Call to address in *next word*.
+The `Cond` field selects the flag condition (e.g., 0000=Unconditional, 0001=Equal, etc.).
 
-=== Stack
+// TODO: Expand flags
 
-==== PUSH -- Push to Stack
+#bitfield-table(
+  (
+    ("Opcode", 6, c-op),
+    ("Cond", 4, c-cond),
+    ("Unused", 6, c-unused),
+  ),
+  encodings: (
+    ("JMP", "Cond", text(fill: gray, "xxxxxx")),
+    ("CALL",  "Cond", text(fill: gray, "xxxxxx")),
+  )
+)
 
-==== POP -- Pop from Stack
+=== RTS
+Return from Subroutine.
 
-== I/O Instructions
+`PC <- M[SP]`, `SP++`.
 
-=== INCHAR -- Input Character
+#bitfield-table(
+  (
+    ("Opcode", 6, c-op),
+    ("Unused", 10, c-unused),
+  ),
+  encodings: (
+    ("RTS", text(fill: gray, "xxxxxxxxxx")),
+  )
+)
 
-=== OUTCHAR -- Output Character
+=== PUSH / POP
+Stack operations. `Sel` bit determines if pushing/popping a General Register (`0`) or the Flag Register (`1`).
+
+#bitfield-table(
+  (
+    ("Opcode", 6, c-op),
+    ("Rx", 3, c-reg),
+    ("Sel", 1, c-func),
+    ("Unused", 6, c-unused),
+  ),
+  encodings: (
+    ("PUSH Rx", "Src", "0", text(fill: gray, "xxxxxx")),
+    ("POP Rx", "Dest", "0", text(fill: gray, "xxxxxx")),
+    ("PUSH FR", text(fill: gray, "xxx"), "1", text(fill: gray, "xxxxxx")),
+    ("POP FR", text(fill: gray, "xxx"), "1", text(fill: gray, "xxxxxx")),
+  )
+)
+
+== System & I/O Instructions
+
+=== INCHAR
+Reads a character from the Keyboard into `Rx`.
+
+#bitfield-table(
+  (
+    ("Opcode", 6, c-op),
+    ("Rx", 3, c-reg),
+    ("Unused", 7, c-unused),
+  ),
+  encodings: (
+    ("INCHAR", "Dest", text(fill: gray, "xxxxxxx")),
+  )
+)
+
+=== OUTCHAR
+Writes a character code from `Rx` to the video position in `Ry`.
+
+#bitfield-table(
+  (
+    ("Opcode", 6, c-op),
+    ("Rx", 3, c-reg),
+    ("Ry", 3, c-reg),
+    ("Unused", 4, c-unused),
+  ),
+  encodings: (
+    ("OUTCHAR", "Char", "Pos", text(fill: gray, "xxxx")),
+  )
+)
+
+=== SETC / BREAKP / HALT / NOP
+System control flags and debugging.
+`SETC` uses Bit 9 to determine Set (1) or Clear (0) Carry.
+
+#bitfield-table(
+  (
+    ("Opcode", 6, c-op),
+    ("Param", 1, c-func),
+    ("Unused", 9, c-unused),
+  ),
+  encodings: (
+    ("SETC", "1", text(fill: gray, "xxxxxxxxx")),
+    ("CLEARC", "0", text(fill: gray, "xxxxxxxxx")),
+    ("BREAKP", text(fill: gray, "x"), text(fill: gray, "xxxxxxxxx")),
+    ("HALT", text(fill: gray, "x"), text(fill: gray, "xxxxxxxxx")),
+    ("NOP", text(fill: gray, "x"), text(fill: gray, "xxxxxxxxx")),
+  )
+)
